@@ -3,17 +3,20 @@ const db = require("better-sqlite3")("ourApp.db");
 db.pragma("journal_mode = WAL");
 const app = express();
 
-//database setup starts here
-const createTables = db.transaction(() =>{
-    db.prepare(
-        `
-        CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username STRING NOT NULL UNIQUE,
-        password STRING NOT NULL
-        )
-        `
-    ).run()
+// database setup starts here
+const createTables = db.transaction(() => {
+    try {
+        db.prepare(`
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username STRING NOT NULL UNIQUE,
+                password STRING NOT NULL
+            )
+        `).run();
+        console.log("Table 'users' is ready.");
+    } catch (error) {
+        console.error("Error creating table:", error);
+    }
 });
 
 createTables();

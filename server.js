@@ -1,10 +1,11 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
 const express = require("express");
 const db = require("better-sqlite3")("ourApp.db");
 db.pragma("journal_mode = WAL");
-const app = express();
+
 
 // database setup starts here
 const createTables = db.transaction(() => {
@@ -27,12 +28,30 @@ createTables();
 
 //database setup ends here
 
+const app = express();
+
 app.set("view engine", "ejs");
 app.use(express.urlencoded({extended: false})) //make req.body works
 app.use(express.static("public"));
+app.use(cookieParser());
+
+
 
 app.use(function(req, res, next){
     res.locals.errors = [];
+
+    // try to decode incoming cookie
+    try {
+        const decoded = jwt.verify(req.cookies.ourSimpleApp, process.env.JWTSECRET);
+        req.user = decoded;
+    } catch(err) {
+        req.user  =false;
+    }
+
+    res.locals.user = req.user;
+    console.log(req.user);
+
+
     next();
 });
 

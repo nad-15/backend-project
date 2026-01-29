@@ -55,17 +55,23 @@ app.post("/register", (req, res)=> {
     if(req.body.username  && !req.body.username.match(/^[a-zA-Z0-9]+$/)) errors.push("Username can only contains letters and numbers.") ;
 
     if(!req.body.password) errors.push("You must provide a password") ;
-    if(req.body.password && req.body.password.length < 12) errors.push("Password must be at least 12 characters.") ;
+    if(req.body.password && req.body.password.length < 7) errors.push("Password must be at least 7 characters.") ;
     if(req.body.password && req.body.password.length > 70) errors.push("Password cannot exceed 70 characters") ;
 
     if(errors.length){
         return res.render("homepage", {errors})
     }
+
+
     
+
     //save the new user into a database
+    const ourStatement = db.prepare("INSERT INTO USERS (username, password) VALUES (?, ?)");
+    ourStatement.run(req.body.username, req.body.password);
+
+    //log the user in by giving them a cookie
     res.send("Thank you for filling out the form.")
 
-    //give the user a cookie
 
 
 });

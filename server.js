@@ -44,6 +44,7 @@ app.use(function(req, res, next){
     try {
         const decoded = jwt.verify(req.cookies.ourSimpleApp, process.env.JWTSECRET);
         req.user = decoded;
+         res.locals.user = decoded;
     } catch(err) {
         req.user  =false;
     }
@@ -56,6 +57,10 @@ app.use(function(req, res, next){
 });
 
 app.get("/", (req, res) => {
+    if (req.user) {
+        return res.render("dashboard");
+    }
+
     res.render("homepage");
 });
 

@@ -13,29 +13,35 @@
     <header>
         <h2><a href="/">Our Wonderful App</a></h2>
         <nav>
-            <a href="/login">Log In</a>
-        </nav>
+            <% if (user) { %>
+                <a href="/create-post">Create Post</a>
+                <a href="/logout">Log Out</a>
+                <% } else { %>
+                   <a href="/login">Log In</a>  
+                <% } %>
+        </nav>              
     </header>
-
-    <main>
+   <main>
         <form action="/register" method="POST">
-            
-            <% errors.forEach(error => { %>
-                <p class="notice"><%= error %></p>
-            <% }) %>
-            
-            <fieldset>
-                <legend>Create an account</legend>
-                
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" autocomplete="off">
 
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" autocomplete="off">
+            <% errors.forEach(error=> { %>
+                <p class="notice">
+                    <%= error %>
+                </p>
+                <% }) %>
 
-                <br />
-                <button>Sign Up</button>
-            </fieldset>
+                    <fieldset>
+                        <legend>Create an account</legend>
+
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" autocomplete="off">
+
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" autocomplete="off">
+
+                        <br />
+                        <button>Sign Up</button>
+                    </fieldset>
         </form>
     </main>
 

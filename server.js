@@ -31,22 +31,22 @@ createTables();
 const app = express();
 
 app.set("view engine", "ejs");
-app.use(express.urlencoded({extended: false})) //make req.body works
+app.use(express.urlencoded({ extended: false })) //make req.body works
 app.use(express.static("public"));
 app.use(cookieParser());
 
 
 
-app.use(function(req, res, next){
+app.use(function (req, res, next) {
     res.locals.errors = [];
 
     // try to decode incoming cookie
     try {
         const decoded = jwt.verify(req.cookies.ourSimpleApp, process.env.JWTSECRET);
         req.user = decoded;
-         res.locals.user = decoded;
-    } catch(err) {
-        req.user  =false;
+        res.locals.user = decoded;
+    } catch (err) {
+        req.user = false;
     }
 
     res.locals.user = req.user;
@@ -73,30 +73,46 @@ app.get("/logout", (req, res) => {
     res.redirect("/");
 });
 
-
-app.post("/register", (req, res)=> {
+app.post("/login", (req, res) => {
     const errors = [];
 
-    if(typeof req.body.username !== "string") req.body.username = "" ;
-    if(typeof req.body.password !== "string") req.body.password = "" ;
+    if (typeof req.body.username !== "string") req.body.username = "";
+    if (typeof req.body.password !== "string") req.body.password = "";
+
+    if (req.body.username.trim() == "") errors.push("Invalid username/password.");
+    if (req.body.password == "") errors.push("Invalid username/password.");
+
+    if (errors.length) {
+        return res.render("/login", {errors});
+    }
+
+    res.send("Thank you for logging in");
+
+})
+
+app.post("/register", (req, res) => {
+    const errors = [];
+
+    if (typeof req.body.username !== "string") req.body.username = "";
+    if (typeof req.body.password !== "string") req.body.password = "";
 
     req.body.username = req.body.username.trim();
 
-    if(!req.body.username) errors.push("You must provide a username") ;
-    if(req.body.username && req.body.username.length < 3) errors.push("Username must be at least 3 characters.") ;
-    if(req.body.username && req.body.username.length > 10) errors.push("Username cannot exceed 10 characters") ;
-    if(req.body.username  && !req.body.username.match(/^[a-zA-Z0-9]+$/)) errors.push("Username can only contains letters and numbers.") ;
+    if (!req.body.username) errors.push("You must provide a username");
+    if (req.body.username && req.body.username.length < 3) errors.push("Username must be at least 3 characters.");
+    if (req.body.username && req.body.username.length > 10) errors.push("Username cannot exceed 10 characters");
+    if (req.body.username && !req.body.username.match(/^[a-zA-Z0-9]+$/)) errors.push("Username can only contains letters and numbers.");
 
-    if(!req.body.password) errors.push("You must provide a password") ;
-    if(req.body.password && req.body.password.length < 7) errors.push("Password must be at least 7 characters.") ;
-    if(req.body.password && req.body.password.length > 70) errors.push("Password cannot exceed 70 characters") ;
+    if (!req.body.password) errors.push("You must provide a password");
+    if (req.body.password && req.body.password.length < 7) errors.push("Password must be at least 7 characters.");
+    if (req.body.password && req.body.password.length > 70) errors.push("Password cannot exceed 70 characters");
 
-    if(errors.length){
-        return res.render("homepage", {errors})
+    if (errors.length) {
+        return res.render("homepage", { errors })
     }
 
 
-    
+
 
     //save the new user into a database
     const salt = bcrypt.genSaltSync(10);
@@ -111,7 +127,7 @@ app.post("/register", (req, res)=> {
 
 
     //log the user in by giving them a cookie
-    const ourTokenValue = jwt.sign({exp: Math.floor(Date.now() / 1000) + 60 * 60 *24, skyColor: "blue", userid: ourUser.id, username:ourUser.username}, process.env.JWTSECRET);
+    const ourTokenValue = jwt.sign({ exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24, skyColor: "blue", userid: ourUser.id, username: ourUser.username }, process.env.JWTSECRET);
 
     res.cookie("ourSimpleApp", ourTokenValue, {
         httpOnly: true,

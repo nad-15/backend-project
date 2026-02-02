@@ -2,15 +2,37 @@
 <html lang="en">
 <%- include('includes/head') %>
 
-<body>
-<%- include('includes/header') %>
+    <body>
+        <%- include('includes/header') %>
 
-    <main>
-        <h3>Log In Page</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsam exercitationem molestias quasi, assumenda corporis tempora error beatae, quo magni dignissimos deleniti distinctio voluptatem minus unde animi aspernatur et nihil? Rerum?</p>
+<main>
+        <form action="/login" method="POST">
+
+            <% errors.forEach(error=> { %>
+                <p class="notice">
+                    <%= error %>
+                </p>
+                
+                <% }) %>
+
+                    <fieldset>
+                        <legend>Log In Page</legend>
+
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" autocomplete="off">
+
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" autocomplete="off">
+
+                        <br />
+                        <button>Log in</button>
+                    </fieldset>
+        </form>
     </main>
-<%- include('includes/footer') %>
 
-    
-</body>
+            <%- include('includes/footer') %>
+
+
+    </body>
+
 </html>

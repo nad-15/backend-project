@@ -9,9 +9,12 @@
             <main>
                 <h3>Hi, <%= user.username %> 👋</h3>
                 <h2>Welcome to your dashboard</h2>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex ducimus fugiat quasi, nemo corrupti
-                    commodi quibusdam magnam! Quisquam, sapiente eligendi. Blanditiis, impedit nesciunt. Soluta autem id
-                    dolores, consequuntur illo tenetur!</p>
+
+                <ul>
+                    <% posts.forEach(post => { %>
+                        <li><a href="/post/<%= post.id %>"><%= post.title %></a> on <%= new Date(post.createdDate).getMonth() + 1 %>/<%= new Date(post.createdDate).getDate()%>/<%= new Date(post.createdDate).getFullYear()%></li>
+                        <% }) %>
+                </ul>
             </main>
 
             <%- include('includes/footer') %>

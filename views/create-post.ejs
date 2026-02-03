@@ -6,7 +6,7 @@
         <%- include('includes/header') %>
 
 <main>
-        <form action="/login" method="POST">
+        <form action="/create-post" method="POST">
 
             <% errors.forEach(error=> { %>
                 <p class="notice">
@@ -16,16 +16,16 @@
                 <% }) %>
 
                     <fieldset>
-                        <legend>Log In Page</legend>
+                        <legend>Create a New Post</legend>
 
-                        <label for="username"><small>Username</small></label>
-                        <input type="text" id="username" name="username" autocomplete="off">
+                        <label for="title"><small>Title</small></label>
+                        <input type="text" id="title" name="title" autocomplete="off">
 
-                        <label for="password"><small>Password</small></label>
-                        <input type="password" id="password" name="password" autocomplete="off">
+                        <label for="body"><small>Content</small></label>
+                        <textarea name="body" id="body"></textarea>
 
                         <br />
-                        <button>Log in</button>
+                        <button>Save New Post</button>
                     </fieldset>
         </form>
     </main>

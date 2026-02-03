@@ -7,7 +7,13 @@
         <%- include('includes/header') %>
         
             <main>
-                <h3>Hi, <%= user.username %> 👋</h3>
+                <% if (posts.length == 0)  {%> 
+                <h3>Hi, <%= user.username %> 👋, you do not have any posts yet.</h3>
+                <% } else { %>
+                                    <h3>Hi, <%= user.username %> 👋, here are your posts.</h3>
+               <% } %>
+
+
                 <h2>Welcome to your dashboard</h2>
 
                 <ul>

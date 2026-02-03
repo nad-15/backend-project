@@ -1,5 +1,6 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const marked = require("marked");
 const sanitizeHTML = require('sanitize-html');
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
@@ -52,6 +53,33 @@ app.use(cookieParser());
 
 
 app.use(function (req, res, next) {
+
+    res.locals.filterUserHTML = function (content) {
+        return sanitizeHTML(marked.parse(content), {
+            allowedTags: [
+                "p",     // paragraph
+                "br",    // line break
+                "strong",// bold
+                "b",     // bold
+                "em",    // italic / emphasis
+                "i",     // italic
+                "u",     // underline
+                "ul",    // unordered list
+                "ol",    // ordered list
+                "li",     // list item
+                "bold",
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "h5",
+                "h6"
+            ],
+
+            allowedAttributes: {}
+        });
+    }
+
     res.locals.errors = [];
 
     // try to decode incoming cookie
@@ -72,7 +100,7 @@ app.use(function (req, res, next) {
 
 app.get("/", (req, res) => {
     if (req.user) {
-        const postsStatement = db.prepare("SELECT * FROM posts WHERE authorid = ?");
+        const postsStatement = db.prepare("SELECT * FROM posts WHERE authorid = ? ORDER BY createdDate DESC");
         const posts = postsStatement.all(req.user.userid);
         return res.render("dashboard", { posts });
     }
@@ -169,6 +197,8 @@ app.get("/edit-post/:id", validateSession, (req, res) => {
         return res.redirect("/");
     }
 
+
+
     // otherwise render edit post template.
     res.render("edit-post", { post });
 
@@ -191,7 +221,7 @@ app.post("/edit-post/:id", validateSession, (req, res) => {
     const errors = sharedPostValidation(req);
 
     if (errors.length) {
-      return res.render("edit-post", { errors });
+        return res.render("edit-post", { errors });
     }
 
     const updateStatement = db.prepare("UPDATE posts SET title = ?, body = ? WHERE id = ?");
@@ -201,7 +231,7 @@ app.post("/edit-post/:id", validateSession, (req, res) => {
 
 });
 
-app.post("/delete-post/:id", validateSession, (req, res)=> {
+app.post("/delete-post/:id", validateSession, (req, res) => {
     // try to look up the post in question
     const statement = db.prepare("SELECT * FROM posts WHERE id = ?");
     const post = statement.get(req.params.id);
@@ -225,8 +255,14 @@ app.get("/post/:id", (req, res) => {
     const statement = db.prepare("SELECT posts.*, users.username FROM posts INNER JOIN users ON posts.authorid = users.id WHERE posts.id = ?");
     const post = statement.get(req.params.id);
 
+    if (!post) {
+        return res.redirect("/");
+    }
 
-    res.render("single-post", { post });
+    const isAuthor = post.authorid === req.user.userid;
+
+
+    res.render("single-post", { post, isAuthor });
 });
 
 app.post("/create-post", validateSession, (req, res) => {
